@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/bloc/todo_bloc.dart';
-import 'package:todo/model/todo.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo/pages/todo_page.dart';
+import 'package:todo/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
       ),
-      body: BlocBuilder<TodoBloc, List<Todo>>(
-        builder: (context, todoList) {
-           final int todoCount = todoList.where((todo) => !todo.isCompleted).length;
-           final int completedCount = todoList.where((todo) => todo.isCompleted).length;
-          return Center(
-            child: Column(
+      body: Center(
+        child: Consumer(
+          builder: (context, watch, _) {
+            final completedCount = ref.watch(completedCountProvider);
+            final notCompletedCount = ref.watch(notCompletedCountProvider);
+            return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                
                     onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => TodoPage(),
                           ),
                         ),
-                    child: Text("Todo Count : $todoCount")),
+                    child: Text("Todo Count : $notCompletedCount")),
                 ElevatedButton(
                     onPressed: () => Navigator.push(
                           context,
@@ -37,12 +35,11 @@ class HomePage extends StatelessWidget {
                             builder: (context) => TodoPage(),
                           ),
                         ),
-                    child:
-                        Text("Completed Count : $completedCount")),
+                    child: Text("Completed Count : $completedCount")),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
